@@ -19,10 +19,10 @@ namespace StudentManagementSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponseDto>>>> GetAllStudents()
+        public async Task<ActionResult<ApiResponse<PaginatedResult<StudentResponseDto>>>> GetAllStudents([FromQuery] StudentQueryParameters queryParams)
         {
-            var students = await _studentService.GetAllStudentsAsync();
-            return Ok(new ApiResponse<IEnumerable<StudentResponseDto>>(true, "Students retrieved successfully", students));
+            var result = await _studentService.GetAllStudentsWithFilterAsync(queryParams);
+            return Ok(new ApiResponse<PaginatedResult<StudentResponseDto>>(true, "Students retrieved successfully", result));
         }
 
         [HttpGet("{id}")]

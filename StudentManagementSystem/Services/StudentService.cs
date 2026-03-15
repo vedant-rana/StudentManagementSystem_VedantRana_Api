@@ -22,6 +22,22 @@ namespace StudentManagementSystem.Services
             return students.Select(MapToResponseDto);
         }
 
+        public async Task<PaginatedResult<StudentResponseDto>> GetAllStudentsWithFilterAsync(StudentQueryParameters queryParams)
+        {
+            var (students, totalCount) = await _studentRepository.GetAllWithFilterAsync(queryParams);
+
+            var studentDtos = students.Select(MapToResponseDto).ToList();
+
+            return new PaginatedResult<StudentResponseDto>
+            {
+                Items = studentDtos,
+                TotalCount = totalCount,
+                Page = queryParams.Page,
+                PageSize = queryParams.PageSize,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)queryParams.PageSize)
+            };
+        }
+
         public async Task<StudentResponseDto?> GetStudentByIdAsync(int id)
         {
             var student = await _studentRepository.GetByIdAsync(id);

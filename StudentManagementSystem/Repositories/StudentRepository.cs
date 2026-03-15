@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StudentManagementSystem.DBContext;
+using StudentManagementSystem.DTOs;
 using StudentManagementSystem.Interfaces;
 
 namespace StudentManagementSystem.Repositories
@@ -18,6 +19,47 @@ namespace StudentManagementSystem.Repositories
             return await _context.Students
                 .Include(s => s.Classes)
                 .ToListAsync();
+        }
+
+        public async Task<(List<Student> Students, int TotalCount)> GetAllWithFilterAsync(StudentQueryParameters queryParams)
+        {
+            var query = _context.Students.Include(s => s.Classes).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(queryParams.Search))
+            {
+                var searchLower = queryParams.Search.ToLower();
+                query = query.Where(s =>
+                    s.FirstName.ToLower().Contains(searchLower) ||
+                    s.LastName.ToLower().Contains(searchLower) ||
+                    s.EmailId.ToLower().Contains(searchLower) ||
+                    s.PhoneNumber.Contains(searchLower));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            query = ApplySorting(query, queryParams.SortField, queryParams.SortOrder);
+
+            var students = await query
+                .Skip((queryParams.Page - 1) * queryParams.PageSize)
+                .Take(queryParams.PageSize)
+                .ToListAsync();
+
+            return (students, totalCount);
+        }
+
+        private IQueryable<Student> ApplySorting(IQueryable<Student> query, string sortField, string sortOrder)
+        {
+            var isAscending = sortOrder.ToLower() == "asc";
+
+            return sortField.ToLower() switch
+            {
+                "firstname" => isAscending ? query.OrderBy(s => s.FirstName) : query.OrderByDescending(s => s.FirstName),
+                "lastname" => isAscending ? query.OrderBy(s => s.LastName) : query.OrderByDescending(s => s.LastName),
+                "email" or "emailid" => isAscending ? query.OrderBy(s => s.EmailId) : query.OrderByDescending(s => s.EmailId),
+                "phonenumber" => isAscending ? query.OrderBy(s => s.PhoneNumber) : query.OrderByDescending(s => s.PhoneNumber),
+                "createdat" => isAscending ? query.OrderBy(s => s.CreatedAt) : query.OrderByDescending(s => s.CreatedAt),
+                _ => isAscending ? query.OrderBy(s => s.FirstName) : query.OrderByDescending(s => s.FirstName)
+            };
         }
 
         public async Task<Student?> GetByIdAsync(int id)
