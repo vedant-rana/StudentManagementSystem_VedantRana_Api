@@ -31,5 +31,12 @@ namespace StudentManagementSystem.Controllers
             var classEntity = await _classService.GetClassByIdAsync(id);
             return Ok(new ApiResponse<ClassDto>(true, "Class retrieved successfully", classEntity));
         }
+
+        [HttpPost("import")]
+        public async Task<ActionResult<ApiResponse<ClassImportResultDto>>> ImportClasses(IFormFile file)
+        {
+            var result = await _classService.ImportClassesAsync(file);
+            return Ok(new ApiResponse<ClassImportResultDto>(true, "Classes imported successfully", result));
+        }
     }
 }

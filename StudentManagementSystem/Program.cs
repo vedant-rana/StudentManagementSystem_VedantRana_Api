@@ -122,6 +122,9 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
+// Register Global Exception Middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

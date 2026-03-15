@@ -30,6 +30,21 @@ namespace StudentManagementSystem.Repositories
                 .ToListAsync();
         }
 
+        public async Task<bool> ExistsByNameAsync(string name)
+        {
+            return await _context.Classes
+                .AnyAsync(c => c.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<List<string>> GetExistingClassNamesAsync(List<string> names)
+        {
+            var lowerNames = names.Select(n => n.ToLower()).ToList();
+            return await _context.Classes
+                .Where(c => lowerNames.Contains(c.Name.ToLower()))
+                .Select(c => c.Name)
+                .ToListAsync();
+        }
+
         public async Task AddRangeAsync(List<Class> classes)
         {
             await _context.Classes.AddRangeAsync(classes);

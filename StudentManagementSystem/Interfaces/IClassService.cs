@@ -6,5 +6,6 @@ namespace StudentManagementSystem.Interfaces
     {
         Task<IEnumerable<ClassDto>> GetAllClassesAsync();
         Task<ClassDto?> GetClassByIdAsync(int id);
+        Task<ClassImportResultDto> ImportClassesAsync(IFormFile file);
     }
 }
