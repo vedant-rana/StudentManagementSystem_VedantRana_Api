@@ -1,0 +1,3 @@
+Scaffold-DbContext "Name=ConnectionStrings:DefaultConnection" Microsoft.EntityFrameworkCore.SqlServer -OutputDir DBContext -Context AppDbContext -Force
+
+Scaffold-DbContext "Server=LAPTOP-52R535B0\SQLEXPRESS;Database=StudentManagementSystem;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=true;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir DBContext -Context AppDbContext -Force
